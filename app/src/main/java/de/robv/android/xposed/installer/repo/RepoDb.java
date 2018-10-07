@@ -33,6 +33,8 @@ public final class RepoDb extends SQLiteOpenHelper {
 
     private static SQLiteDatabase sDb;
 
+    private static Context context;
+
     static {
         RepoDb instance = new RepoDb(XposedApp.getInstance());
         sDb = instance.getWritableDatabase();
@@ -377,6 +379,11 @@ public final class RepoDb extends SQLiteOpenHelper {
                     + " OR m." + ModulesColumns.AUTHOR + " LIKE ?)";
             String filterTextArg = "%" + filterText + "%";
             whereArgs = new String[]{filterTextArg, filterTextArg, filterTextArg, filterTextArg};
+        } else {
+            // No chinese
+            for (char ch : "的一是不了人我在有他这为中设微模块".toCharArray()) {
+                where += " AND NOT (m." + ModulesColumns.TITLE + " LIKE '%" + ch + "%'" + " OR m." + ModulesColumns.SUMMARY + " LIKE '%" + ch + "%'" + " OR m." + ModulesColumns.DESCRIPTION + " LIKE '%" + ch + "%'" + " OR m." + ModulesColumns.AUTHOR + " LIKE '%" + ch + "%')";
+            }
         }
 
         // Sorting order
